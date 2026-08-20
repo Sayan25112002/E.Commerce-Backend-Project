@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String email, ChangePasswordRequest request) {
         User user = userRepository.getUserByEmail(email);
-        if(!passwordEncoder.matches(request.getCurrentPassword),user.getPassword()){
+        if(!passwordEncoder.matches(request.getCurrentPassword(),user.getPassword())){
             throw new BadCredentialsException("Current Password is Incorrect");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
