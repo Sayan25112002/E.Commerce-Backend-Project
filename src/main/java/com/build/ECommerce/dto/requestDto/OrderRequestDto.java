@@ -19,10 +19,6 @@ import java.util.List;
 @Builder
 public class OrderRequestDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @NotBlank(message = "Address is Required")
     private String address;
 
