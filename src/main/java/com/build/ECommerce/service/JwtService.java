@@ -27,9 +27,9 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String username) {
         Map<String,Object> claims = new HashMap<>();
-        return createToken(claims,userDetails.getUsername());
+        return createToken(claims,username);
     }
 
     private String createToken(Map<String,Object> claims,String subject) {

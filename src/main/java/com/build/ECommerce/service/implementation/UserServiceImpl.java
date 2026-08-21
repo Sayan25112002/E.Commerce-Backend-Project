@@ -1,15 +1,20 @@
 package com.build.ECommerce.service.implementation;
 
 import com.build.ECommerce.dto.requestDto.ChangePasswordRequest;
+import com.build.ECommerce.dto.requestDto.LoginRequestDto;
 import com.build.ECommerce.dto.requestDto.UserRequestDto;
+import com.build.ECommerce.dto.responseDto.LoginResponseDto;
 import com.build.ECommerce.dto.responseDto.UserResponseDto;
 import com.build.ECommerce.entity.User;
 import com.build.ECommerce.exception.ResourceNotFoundException;
 import com.build.ECommerce.mapper.UserMapper;
 import com.build.ECommerce.repository.UserRepository;
+import com.build.ECommerce.service.JwtService;
 import com.build.ECommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +25,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JwtService jwtService;
+
+    @Override
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword()));
+        String jwt = jwtService.generateToken(loginRequestDto.getUsername());
+        return new LoginResponseDto(jwt);
+    }
 
     @Override
     public UserResponseDto registerUser(UserRequestDto userRequestDto) {
