@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword()));
-        String jwt = jwtService.generateToken(loginRequestDto.getUsername());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
+        String jwt = jwtService.generateToken(loginRequestDto.getEmail());
         return new LoginResponseDto(jwt);
     }
 
@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         user.setEmail(userRequestDto.getEmail());
+        user.setRole(User.Role.USER);
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(savedUser);
     }
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
         if(!passwordEncoder.matches(request.getCurrentPassword(),user.getPassword())){
             throw new BadCredentialsException("Current Password is Incorrect");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
 
