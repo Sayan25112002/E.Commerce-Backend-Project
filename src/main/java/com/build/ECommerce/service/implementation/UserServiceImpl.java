@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(String email, ChangePasswordRequest request) {
-        User user = userRepository.getUserByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("User Not Found"));
         if(!passwordEncoder.matches(request.getCurrentPassword(),user.getPassword())){
             throw new BadCredentialsException("Current Password is Incorrect");
         }
