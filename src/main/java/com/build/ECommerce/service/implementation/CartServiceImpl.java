@@ -6,6 +6,7 @@ import com.build.ECommerce.entity.CartItem;
 import com.build.ECommerce.entity.Product;
 import com.build.ECommerce.entity.User;
 import com.build.ECommerce.exception.InsufficientStockFoundation;
+import com.build.ECommerce.exception.ResourceNotFoundException;
 import com.build.ECommerce.mapper.CartMapper;
 import com.build.ECommerce.repository.CartRepository;
 import com.build.ECommerce.repository.ProductRepository;
@@ -50,11 +51,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponseDto getCart(Long userId) {
-        return null;
+        Cart cart = cartRepository.findByUserId(userId).orElseThrow(()->new ResourceNotFoundException("Cart not found"));
+        return cartMapper.toCartResponseDto(cart);
     }
 
     @Override
     public void clearCart(Long userId) {
-
+        Cart cart = cartRepository.findByUserId(userId).orElseThrow(()->new ResourceNotFoundException("Cart not found"));
+        cart.getItems().clear();
+        cartRepository.save(cart);
     }
 }
