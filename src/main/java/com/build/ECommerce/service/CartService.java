@@ -1,10 +1,13 @@
 package com.build.ECommerce.service;
 
 import com.build.ECommerce.dto.responseDto.CartResponseDto;
+import com.build.ECommerce.exception.InsufficientStockFoundation;
 
 public interface CartService {
 
-    public CartResponseDto addCart(Long userId, Long productId, Integer quantity);
+    public CartResponseDto addCart(Long userId, Long productId, Integer quantity) throws InsufficientStockFoundation;
+
+    CartResponseDto getCart(Long userId);
 
     void clearCart(Long userId);
 
