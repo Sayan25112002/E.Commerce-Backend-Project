@@ -5,10 +5,10 @@ import com.build.ECommerce.exception.InsufficientStockFoundation;
 
 public interface CartService {
 
-    public CartResponseDto addCart(Long userId, Long productId, Integer quantity) throws InsufficientStockFoundation;
+    public CartResponseDto addCart(String email, Long productId, Integer quantity) throws InsufficientStockFoundation;
 
-    CartResponseDto getCart(Long userId);
+    CartResponseDto getCart(String email);
 
-    void clearCart(Long userId);
+    void clearCart(String email);
 
 }

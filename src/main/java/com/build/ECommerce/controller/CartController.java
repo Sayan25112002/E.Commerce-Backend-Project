@@ -8,6 +8,7 @@ import com.build.ECommerce.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,23 +22,23 @@ public class CartController {
 
     @PostMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CartResponseDto> addCart(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long productId, @RequestParam Integer quantity) throws InsufficientStockFoundation {
-        Long userId = ((User) userDetails).getId();
-        return ResponseEntity.ok(cartService.addCart(userId, productId, quantity));
+    public ResponseEntity<CartResponseDto> addCart(Authentication authentication, @RequestParam Long productId, @RequestParam Integer quantity) throws InsufficientStockFoundation {
+        String email = authentication.getName();
+        return ResponseEntity.ok(cartService.addCart(email, productId, quantity));
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CartResponseDto> getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((User) userDetails).getId();
-        return ResponseEntity.ok(cartService.getCart(userId));
+    public ResponseEntity<CartResponseDto> getCart(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(cartService.getCart(email));
     }
 
-    @GetMapping
+    @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CartResponseDto> clearCart(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((User) userDetails).getId();
-        cartService.clearCart(userId);
+    public ResponseEntity<Void> clearCart(Authentication authentication) {
+        String email = authentication.getName();
+        cartService.clearCart(email);
         return ResponseEntity.noContent().build();
     }
 }
