@@ -8,6 +8,7 @@ import com.build.ECommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,11 +22,13 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/createProduct")
+    @PreAuthorize("hasRole(ADMIN)")
     public ResponseEntity<ProductResponseDto> createProduct(@ModelAttribute ProductRequestDto product) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(product));
     }
 
     @PatchMapping("/updateProduct/{id}")
+    @PreAuthorize("hasRole(ADMIN)")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequestDto productRequestDto) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.updateProduct(productRequestDto, id));
     }
@@ -41,6 +44,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/deleteProduct/{id}")
+    @PreAuthorize("hasRole(ADMIN)")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) throws IOException {
         productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
