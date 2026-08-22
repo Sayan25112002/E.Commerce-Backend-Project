@@ -12,6 +12,8 @@ import com.build.ECommerce.repository.ProductRepository;
 import com.build.ECommerce.repository.UserRepository;
 import com.build.ECommerce.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,14 +29,16 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
 
     @Override
-    public CommentResponseDto addComment(CommentRequestDto commentRequestDto, Long productId, Long userId) {
+    public CommentResponseDto addComment(CommentRequestDto commentRequestDto, Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         Comment comment = commentMapper.toComment(commentRequestDto);
         comment.setProduct(product);
         comment.setUser(user);
-        commentRepository.save(comment);
-        return commentMapper.toCommentResponseDto(comment);
+        Comment savedComment = commentRepository.save(comment);
+        return commentMapper.toCommentResponseDto(savedComment);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentResponseDto addComment(CommentRequestDto commentRequestDto, Long productId, Long userId);
+    CommentResponseDto addComment(CommentRequestDto commentRequestDto, Long userId);
 
     List<CommentResponseDto> getCommentsByProduct(Long productId);
 
