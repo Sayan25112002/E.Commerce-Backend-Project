@@ -10,7 +10,7 @@ public interface ProductService {
 
     ProductResponseDto createProduct(ProductRequestDto productRequestDto) throws IOException;
 
-    ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long id);
+    ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long id) throws IOException;
 
     ProductResponseDto getProduct(Long id);
 

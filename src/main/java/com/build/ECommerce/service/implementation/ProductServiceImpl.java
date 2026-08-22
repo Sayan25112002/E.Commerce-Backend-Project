@@ -42,9 +42,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long id) {
+    public ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long id) throws IOException {
         Product product = productRepository.findById(id).orElseThrow(()->new RuntimeException("product not found"));
         productMapper.updateProduct(productRequestDto,product);
+        MultipartFile imageFile = productRequestDto.getImageFile();
+        if(imageFile!=null && !imageFile.isEmpty()){
+            product.setImage(saveFile(imageFile));
+        }
         Product updatedProduct = productRepository.save(product);
         return productMapper.toProductResponseDto(updatedProduct);
     }
