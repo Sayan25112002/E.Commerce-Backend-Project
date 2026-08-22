@@ -22,13 +22,13 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/createProduct")
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> createProduct(@ModelAttribute ProductRequestDto product) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(product));
     }
 
     @PatchMapping("/updateProduct/{id}")
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequestDto productRequestDto) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.updateProduct(productRequestDto, id));
     }
@@ -44,7 +44,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/deleteProduct/{id}")
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) throws IOException {
         productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
