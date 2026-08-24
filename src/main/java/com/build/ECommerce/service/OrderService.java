@@ -1,10 +1,11 @@
 package com.build.ECommerce.service;
 
-import com.build.ECommerce.dto.requestDto.OrderRequestDto;
 import com.build.ECommerce.dto.responseDto.OrderResponseDto;
+
+import java.util.List;
 
 public interface OrderService {
 
-    OrderResponseDto createOrder(Long userId, String address, String phoneNumber);
+    OrderResponseDto createOrder(String userEmail, String address, String phoneNumber);
 
 }
