@@ -1,10 +1,12 @@
 package com.build.ECommerce.controller;
 
+import com.build.ECommerce.dto.requestDto.CartItemRequestDto;
 import com.build.ECommerce.dto.responseDto.CartResponseDto;
 import com.build.ECommerce.entity.Cart;
 import com.build.ECommerce.entity.User;
 import com.build.ECommerce.exception.InsufficientStockFoundation;
 import com.build.ECommerce.service.CartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +22,14 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/add")
+    @PostMapping("/add/{productId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CartResponseDto> addCart(Authentication authentication, @RequestParam Long productId, @RequestParam Integer quantity) throws InsufficientStockFoundation {
+    public ResponseEntity<CartResponseDto> addCart(Authentication authentication,
+                                                   @PathVariable Long productId,
+                                                   @Valid @RequestBody CartItemRequestDto cartItemRequestDto)
+            throws InsufficientStockFoundation {
         String email = authentication.getName();
-        return ResponseEntity.ok(cartService.addCart(email, productId, quantity));
+        return ResponseEntity.ok(cartService.addCart(email, productId, cartItemRequestDto.getQuantity()));
     }
 
     @GetMapping

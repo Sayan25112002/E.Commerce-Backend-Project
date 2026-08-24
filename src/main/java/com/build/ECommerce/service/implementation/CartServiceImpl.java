@@ -31,14 +31,14 @@ public class CartServiceImpl implements CartService {
     public CartResponseDto addCart(String email, Long productId, Integer quantity) throws InsufficientStockFoundation {
         User user = userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("user not found"));
         Product product = productRepository.findById(productId).orElseThrow(()->new RuntimeException("product not found"));
-        if(product.getQuantity()<quantity){
-            throw new InsufficientStockFoundation("Not enough available");
-        }
         Cart cart = cartRepository.findByUserId(user.getId()).orElse(new Cart(null,user,new ArrayList<>()));
         Optional<CartItem> existingCartItem = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getProduct().getId().equals(product.getId()))
                 .findFirst();
         int newQuantity = quantity;
+        if(existingCartItem.isPresent()){
+            newQuantity = existingCartItem.get().getQuantity() + quantity;
+        }
         if(product.getQuantity()<newQuantity){
             throw new InsufficientStockFoundation("Not enough available");
         }
