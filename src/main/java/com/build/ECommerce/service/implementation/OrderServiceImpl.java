@@ -4,10 +4,8 @@ import com.build.ECommerce.dto.requestDto.CartItemRequestDto;
 import com.build.ECommerce.dto.requestDto.OrderRequestDto;
 import com.build.ECommerce.dto.responseDto.CartResponseDto;
 import com.build.ECommerce.dto.responseDto.OrderResponseDto;
-import com.build.ECommerce.entity.Cart;
-import com.build.ECommerce.entity.Order;
-import com.build.ECommerce.entity.OrderItem;
-import com.build.ECommerce.entity.User;
+import com.build.ECommerce.entity.*;
+import com.build.ECommerce.exception.InsufficientStockFoundation;
 import com.build.ECommerce.mapper.CartMapper;
 import com.build.ECommerce.mapper.OrderMapper;
 import com.build.ECommerce.repository.OrderRepository;
@@ -16,6 +14,7 @@ import com.build.ECommerce.repository.UserRepository;
 import com.build.ECommerce.service.CartService;
 import com.build.ECommerce.service.EmailService;
 import com.build.ECommerce.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +65,40 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponseDto(savedOrder);
     }
 
+    @Override
+    public List<OrderResponseDto> getAllOrders() {
+        return orderMapper.toOrderResponseDtoList(orderRepository.findAll());
+    }
 
+    @Override
+    public List<OrderResponseDto> getAllOrdersByUserEmail(Long userId) {
+        return orderMapper.toOrderResponseDtoList(orderRepository.findByUserId(userId));
+    }
+
+    @Override
+    public OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        order.setStatus(orderStatus);
+        Order updatedOrder = orderRepository.save(order);
+        return orderMapper.toOrderResponseDto(updatedOrder);
+    }
+
+    private List<OrderItem> createOrderItems(Cart cart, Order order) {
+        return cart.getItems().stream().map(cartItem->{
+            Product product = productRepository.findById(cartItem
+                    .getProduct()
+                    .getId())
+                    .orElseThrow(()->
+                            new EntityNotFoundException("Product not found with id : "+cartItem.getProduct().getId()));
+            if(product.getQuantity()==null){
+                throw new IllegalStateException("Product Quantity is not set for product "+product.getName());
+            }
+            if(product.getQuantity()<cartItem.getQuantity()){
+                throw new IllegalStateException("Not enough stock for product "+product.getName());
+            }
+            product.setQuantity(product.getQuantity()-cartItem.getQuantity());
+            productRepository.save(product);
+            return new OrderItem(null,order,product,cartItem.getQuantity(),product.getPrice());
+        }).collect(Collectors.toList());
+    }
 }
