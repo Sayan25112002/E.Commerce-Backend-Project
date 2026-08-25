@@ -13,13 +13,13 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("spring.mail.username")
+    @Value("${spring.mail.username}")
     private String fromEmail;
 
     public void sendOrderConfirmationEmail(Order order) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
-        message.setTo(order.getUser().getEmail());
+        message.setTo("vhadjz5965@minitts.net");
         message.setSubject("Order Confirmation");
         message.setText("Your Order has been confirmed. Order Id : "+order.getId());
         mailSender.send(message);
