@@ -11,7 +11,7 @@ public interface OrderService {
 
     List<OrderResponseDto> getAllOrders();
 
-    List<OrderResponseDto> getAllOrdersByUserEmail(Long userId);
+    List<OrderResponseDto> getAllOrdersByUserEmail(String userEmail);
 
     OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus);
 

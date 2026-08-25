@@ -19,10 +19,8 @@ import java.util.List;
 @Builder
 public class OrderRequestDto {
 
-    @NotBlank(message = "Address is Required")
     private String address;
 
-    @NotBlank(message = "Phone Number is Required")
     private String phoneNumber;
 
     private Order.OrderStatus orderStatus;

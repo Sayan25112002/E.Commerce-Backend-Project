@@ -54,10 +54,16 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponseDto getCart(String email) {
+    public CartResponseDto getCartDto(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("user not found"));
-        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(()->new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("cart not found"));
         return cartMapper.toCartResponseDto(cart);
+    }
+
+    @Override
+    public Cart getCart(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("user not found"));
+        return cartRepository.findByUserId(user.getId()).orElseThrow(()->new ResourceNotFoundException("Cart not found"));
     }
 
     @Override
