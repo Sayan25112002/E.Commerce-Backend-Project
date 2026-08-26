@@ -22,7 +22,7 @@ public class OrderResponseDto {
 
     private String phoneNumber;
 
-    private Order.OrderStatus orderStatus;
+    private Order.OrderStatus status;
 
     private LocalDateTime createdAt;
 
