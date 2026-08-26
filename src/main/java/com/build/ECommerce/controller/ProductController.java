@@ -3,8 +3,6 @@ package com.build.ECommerce.controller;
 import com.build.ECommerce.dto.requestDto.ProductRequestDto;
 import com.build.ECommerce.dto.responseDto.ProductListResponseDto;
 import com.build.ECommerce.dto.responseDto.ProductResponseDto;
-import com.build.ECommerce.entity.Product;
-import com.build.ECommerce.repository.ProductRepository;
 import com.build.ECommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

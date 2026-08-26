@@ -1,8 +1,6 @@
 package com.build.ECommerce.dto.responseDto;
 
-import com.build.ECommerce.dto.requestDto.OrderItemRequestDto;
 import com.build.ECommerce.entity.Order;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;

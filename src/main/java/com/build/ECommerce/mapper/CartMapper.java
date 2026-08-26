@@ -12,8 +12,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CartMapper {
 
-    Cart toCart(CartResponseDto cartResponseDto);
-
     @Mapping(source = "user.id",target = "userId")
     @Mapping(source = "items", target = "cartItems")
     CartResponseDto toCartResponseDto(Cart cart);

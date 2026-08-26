@@ -2,14 +2,11 @@ package com.build.ECommerce.controller;
 
 import com.build.ECommerce.dto.requestDto.CommentRequestDto;
 import com.build.ECommerce.dto.responseDto.CommentResponseDto;
-import com.build.ECommerce.entity.User;
 import com.build.ECommerce.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
