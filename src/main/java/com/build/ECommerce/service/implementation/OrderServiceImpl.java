@@ -36,6 +36,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto createOrder(String email, String address, String phoneNumber) {
         User user = userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("User not found"));
+        if(!Boolean.TRUE.equals(user.getEmailConfirmation())){
+            throw new IllegalStateException("Email not confirmed. Please confirm email before placing order");
+        }
         Cart cart = cartService.getCart(email);
         if(cart.getItems().isEmpty()){
             throw new IllegalStateException("Cannot create order with an empty card");
