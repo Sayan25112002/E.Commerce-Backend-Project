@@ -9,6 +9,7 @@ import com.build.ECommerce.entity.User;
 import com.build.ECommerce.exception.ResourceNotFoundException;
 import com.build.ECommerce.mapper.UserMapper;
 import com.build.ECommerce.repository.UserRepository;
+import com.build.ECommerce.service.EmailService;
 import com.build.ECommerce.service.JwtService;
 import com.build.ECommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
@@ -42,8 +46,11 @@ public class UserServiceImpl implements UserService {
         };
         User user = new User();
         user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
+        user.setRole(User.Role.USER);
+        user.setConfirmationCode(generationCode());
         user.setEmail(userRequestDto.getEmail());
         user.setRole(User.Role.USER);
+        emailService.sendEmailConfirmation(user);
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(savedUser);
     }
@@ -63,5 +70,25 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+
+    @Override
+    public void confirmEmail(String email, String confirmationCode) {
+        User user = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("User Not Found"));
+        if(user.getConfirmationCode().equals(confirmationCode)){
+            user.setEmailConfirmation(true);
+            user.setConfirmationCode(null);
+            userRepository.save(user);
+        }
+        else{
+            throw new BadCredentialsException("Confirmation Code is Incorrect");
+        }
+    }
+
+    private String generationCode() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code);
+    }
+
 
 }

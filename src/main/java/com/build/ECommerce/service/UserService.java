@@ -17,4 +17,6 @@ public interface UserService {
 
     void changePassword(String email, ChangePasswordRequest request);
 
+    void confirmEmail(String email, String confirmationCode);
+
 }
