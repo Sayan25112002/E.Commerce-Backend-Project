@@ -1,5 +1,6 @@
 package com.build.ECommerce.repository;
 
+import com.build.ECommerce.dto.responseDto.ProductListResponseDto;
 import com.build.ECommerce.dto.responseDto.ProductResponseDto;
 import com.build.ECommerce.entity.Product;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,6 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT new com.build.ECommerce.dto.responseDto.ProductListResponseDto(p.id, p.name, p.description, p.price, p.quantity, p.image) FROM Product p")
-    Page<ProductResponseDto> findAllWithoutComments(Pageable pageable);
+    Page<ProductListResponseDto> findAllWithoutComments(Pageable pageable);
 
 }

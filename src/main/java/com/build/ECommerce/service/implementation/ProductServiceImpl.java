@@ -1,12 +1,15 @@
 package com.build.ECommerce.service.implementation;
 
 import com.build.ECommerce.dto.requestDto.ProductRequestDto;
+import com.build.ECommerce.dto.responseDto.ProductListResponseDto;
 import com.build.ECommerce.dto.responseDto.ProductResponseDto;
 import com.build.ECommerce.entity.Product;
 import com.build.ECommerce.mapper.ProductMapper;
 import com.build.ECommerce.repository.ProductRepository;
 import com.build.ECommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,6 +66,11 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return productMapper.toProductResponseDtoList(products);
+    }
+
+    @Override
+    public Page<ProductListResponseDto> getAllProductsInPages(Pageable pageable) {
+        return productRepository.findAllWithoutComments(pageable);
     }
 
     @Override

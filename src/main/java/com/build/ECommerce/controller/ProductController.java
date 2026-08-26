@@ -1,11 +1,15 @@
 package com.build.ECommerce.controller;
 
 import com.build.ECommerce.dto.requestDto.ProductRequestDto;
+import com.build.ECommerce.dto.responseDto.ProductListResponseDto;
 import com.build.ECommerce.dto.responseDto.ProductResponseDto;
 import com.build.ECommerce.entity.Product;
 import com.build.ECommerce.repository.ProductRepository;
 import com.build.ECommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,5 +52,10 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) throws IOException {
         productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ProductListResponseDto>> getAllProductsInPages(@PageableDefault(size = 10) Pageable pageable){
+        return ResponseEntity.ok(productService.getAllProductsInPages(pageable));
     }
 }
