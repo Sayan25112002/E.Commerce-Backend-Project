@@ -76,6 +76,16 @@ public class OrderServiceImpl implements OrderService {
         if(orderStatus==null){
             throw new IllegalStateException("Order status cannot be null");
         }
+        if(orderStatus== Order.OrderStatus.DELIVERING){
+            orderStatus=Order.OrderStatus.DELIVERING;
+            emailService.sendDeliveringConfirmationEmail(orderRepository.findById(orderId).get());
+        }else if(orderStatus== Order.OrderStatus.DELIVERED){
+            orderStatus=Order.OrderStatus.DELIVERED;
+            emailService.sendDeliveredConfirmationEmail(orderRepository.findById(orderId).get());
+        }else if(orderStatus== Order.OrderStatus.CANCELLED){
+            orderStatus=Order.OrderStatus.CANCELLED;
+            emailService.sendCancelledConfirmationEmail(orderRepository.findById(orderId).get());
+        }
         Order order = orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
         order.setStatus(orderStatus);
         Order updatedOrder = orderRepository.save(order);
