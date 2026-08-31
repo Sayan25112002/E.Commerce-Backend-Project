@@ -9,8 +9,10 @@ import com.build.ECommerce.repository.UserRepository;
 import com.build.ECommerce.service.CartService;
 import com.build.ECommerce.service.EmailService;
 import com.build.ECommerce.service.OrderService;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -72,23 +74,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus) {
+    public OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus) throws JRException, MessagingException {
         if(orderStatus==null){
             throw new IllegalStateException("Order status cannot be null");
-        }
-        if(orderStatus== Order.OrderStatus.DELIVERING){
-            orderStatus=Order.OrderStatus.DELIVERING;
-            emailService.sendDeliveringConfirmationEmail(orderRepository.findById(orderId).get());
-        }else if(orderStatus== Order.OrderStatus.DELIVERED){
-            orderStatus=Order.OrderStatus.DELIVERED;
-            emailService.sendDeliveredConfirmationEmail(orderRepository.findById(orderId).get());
-        }else if(orderStatus== Order.OrderStatus.CANCELLED){
-            orderStatus=Order.OrderStatus.CANCELLED;
-            emailService.sendCancelledConfirmationEmail(orderRepository.findById(orderId).get());
         }
         Order order = orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
         order.setStatus(orderStatus);
         Order updatedOrder = orderRepository.save(order);
+        if(orderStatus== Order.OrderStatus.DELIVERING){
+            emailService.sendDeliveringConfirmationEmail(updatedOrder);
+        }else if(orderStatus== Order.OrderStatus.DELIVERED){
+            emailService.sendDeliveredConfirmationEmail(updatedOrder);
+        }else if(orderStatus== Order.OrderStatus.CANCELLED){
+            emailService.sendCancelledConfirmationEmail(updatedOrder);
+        }
         return orderMapper.toOrderResponseDto(updatedOrder);
     }
 

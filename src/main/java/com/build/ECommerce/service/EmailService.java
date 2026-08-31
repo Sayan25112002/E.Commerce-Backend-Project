@@ -3,19 +3,35 @@ package com.build.ECommerce.service;
 import com.build.ECommerce.entity.Order;
 import com.build.ECommerce.entity.OrderItem;
 import com.build.ECommerce.entity.User;
+import com.build.ECommerce.exception.ResourceNotFoundException;
+import com.build.ECommerce.repository.OrderRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final OrderRepository orderRepository;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -26,14 +42,14 @@ public class EmailService {
         message.setTo("vhadjz5965@minitts.net");
         message.setSubject("Order Confirmation - Order # "+order.getId());
         StringBuilder messageText = new StringBuilder();
-        messageText.append("Order Confirmed \n");
-        messageText.append("Hello\n\n");
-        messageText.append("Your Order has been placed successfully\n\n");
-        messageText.append("Order ID: "+order.getId()+"\n");
-        messageText.append("Order Status: "+order.getStatus()+"\n");
-        messageText.append("Order Date: "+order.getCreatedAt()+"\n\n");
-        messageText.append("Order Details:\n");
-        messageText.append("--------------------------------\n");
+        messageText.append("Order Confirmed \n " +
+                "Hello\n\n "+
+                "Your Order has been placed successfully\n\n"+
+                "Order ID: "+order.getId()+"\n"+
+                "Order Status: "+order.getStatus()+"\n"+
+                "Order Date: "+order.getCreatedAt()+"\n\n"+
+                "Order Details:\n"+
+                "--------------------------------\n");
         for(OrderItem orderItem : order.getOrderItems()) {
             BigDecimal subTotal = orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
             messageText.append("Product: ")
@@ -77,11 +93,13 @@ public class EmailService {
         mailSender.send(deliveringMessage);
     }
 
-    public void sendDeliveredConfirmationEmail(Order order) {
-        SimpleMailMessage deliveredMessage = new SimpleMailMessage();
-        deliveredMessage.setFrom(fromEmail);
-        deliveredMessage.setTo("vhadjz5965@minitts.net");
-        deliveredMessage.setSubject("Order Delivered - Order # "+order.getId());
+    public void sendDeliveredConfirmationEmail(Order order) throws JRException, MessagingException {
+        byte[] bill = generateBill(order.getId());
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(fromEmail);
+        helper.setTo("vhadjz5965@minitts.net");
+        helper.setSubject("Order Delivered - Order # "+order.getId());
         StringBuilder deliveredText = new StringBuilder();
         deliveredText.append("Order Delivered \n");
         deliveredText.append("Your order "+order.getId()+" has been delivered to your given address\n");
@@ -93,8 +111,9 @@ public class EmailService {
         deliveredText.append("Thank You For Shopping with Us!\n\n");
         deliveredText.append("Best Regards\n");
         deliveredText.append("Ecommerce Team");
-        deliveredMessage.setText(deliveredText.toString());
-        mailSender.send(deliveredMessage);
+        helper.setText(deliveredText.toString());
+        helper.addAttachment("Order-Bill-"+order.getId()+".pdf",new ByteArrayResource(bill));
+        mailSender.send(message);
     }
 
     public void sendCancelledConfirmationEmail(Order order) {
@@ -123,5 +142,38 @@ public class EmailService {
         message.setSubject("Confirm your Email");
         message.setText("Please confirm your email by entering this code "+user.getConfirmationCode());
         mailSender.send(message);
+    }
+
+    public byte[] generateBill(Long id) throws JRException {
+        String resourceDir = System.getProperty("user.dir")+"\\src\\main\\resources\\report\\";
+        Path path = Paths.get(resourceDir,"Bill.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(path.toString());
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        JRBeanCollectionDataSource orderDataSource = new JRBeanCollectionDataSource(orderRepository.findAll());
+        Map<String,Object> data = new HashMap<>();
+        for(Field field : order.getClass().getDeclaredFields()){
+            field.setAccessible(true);
+            try {
+                data.put(field.getName(),field.get(order));
+            }catch(IllegalAccessException e){
+                throw new JRRuntimeException(e);
+            }
+        }
+        List<Map<String,Object>> orderItems = order
+                .getOrderItems()
+                .stream()
+                .map(item->{
+                    Map<String,Object> itemData = new HashMap<>();
+                    itemData.put("product",item.getProduct().getName());
+                    itemData.put("quantity",item.getQuantity());
+                    itemData.put("price",item.getPrice());
+                    return itemData;
+                })
+                .toList();
+        data.put("orderItems",orderItems);
+        Map<String,Object> parameter = new HashMap<>();
+        parameter.put("data",data);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,parameter,orderDataSource);
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
 }

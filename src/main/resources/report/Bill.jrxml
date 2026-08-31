@@ -65,9 +65,9 @@
         <field name="quantity" class="java.lang.Integer"/>
         <field name="price" class="java.math.BigDecimal"/>
         <variable name="subTotal" class="java.math.BigDecimal">
-            <variableExpression><![CDATA[$F{quantity}]]></variableExpression>
+            <variableExpression><![CDATA[$F{price}.multiply(java.math.BigDecimal.valueOf($F{quantity}.longValue()))]]></variableExpression>
         </variable>
-        <variable name="total" class="java.math.BigDecimal" calculation="Sum">
+        <variable name="total" class="java.lang.Integer" calculation="Sum">
             <variableExpression><![CDATA[$V{subTotal}]]></variableExpression>
         </variable>
     </subDataset>
@@ -156,7 +156,7 @@
                     <rightPen lineWidth="1.0"/>
                 </box>
                 <textElement verticalAlignment="Middle"/>
-                <textFieldExpression><![CDATA["ORDER DATE: "+$P{data}.get("date")]]></textFieldExpression>
+                <textFieldExpression><![CDATA["ORDER DATE: "+$P{data}.get("createdAt")]]></textFieldExpression>
             </textField>
         </band>
     </columnHeader>
@@ -237,8 +237,8 @@
                     <property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
                 </reportElement>
                 <jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-                    <datasetRun subDataset="productDataset" uuid="9c9833a6-7f27-4839-ab54-678949b560e2">
-                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((java.util.Collection)$P{data}.get("productDetails"))]]></dataSourceExpression>
+                    <datasetRun subDataset="productDataset" uuid="8c39c9a6-b566-4cff-8c75-f175278e3385">
+                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((java.util.Collection)$P{data}.get("orderItems"))]]></dataSourceExpression>
                     </datasetRun>
                     <jr:column width="140" uuid="a5eddd75-224a-4ec3-ae4c-7f181779f1e8">
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
@@ -277,7 +277,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
                         <jr:detailCell style="Table_TD" height="30">
                             <textField>
-                                <reportElement x="0" y="0" width="125" height="30" uuid="9d3698af-fda9-4b3e-9b79-92cc7e9f168c"/>
+                                <reportElement x="0" y="0" width="125" height="30" uuid="11371c54-dc52-4c76-a630-099fb4a7df45"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle"/>
                                 <textFieldExpression><![CDATA[$V{subTotal}]]></textFieldExpression>
                             </textField>
@@ -286,27 +286,25 @@
                 </jr:table>
             </componentElement>
         </band>
-    </detail>
-    <columnFooter>
-        <band height="30" splitType="Stretch">
+        <band height="111">
             <property name="com.jaspersoft.studio.unit.height" value="px"/>
             <componentElement>
-                <reportElement x="0" y="0" width="555" height="30" uuid="df68a41c-395b-41c5-b1cc-14c3231ff6eb">
+                <reportElement x="0" y="0" width="555" height="30" uuid="2f82f4fc-289e-4142-a948-a1f81cfcca6d">
                     <property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
                     <property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
                     <property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
                     <property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
                 </reportElement>
                 <jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-                    <datasetRun subDataset="productDataset" uuid="0fc0b4d9-b22c-4cb9-a5d5-5116356ec447">
-                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((java.util.Collection)$P{data}.get("productDetails"))]]></dataSourceExpression>
+                    <datasetRun subDataset="productDataset" uuid="eaf04f1e-81ea-4c22-a3a9-33e827e6d5c3">
+                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((java.util.Collection)$P{data}.get("orderItems"))]]></dataSourceExpression>
                     </datasetRun>
-                    <jr:column width="430" uuid="ee69373c-598c-429d-b9ce-bda95b030038">
+                    <jr:column width="430" uuid="8055de3e-a78f-4a6c-8f23-bea5774cb20d">
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
                         <jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
                             <property name="com.jaspersoft.studio.unit.width" value="px"/>
                             <staticText>
-                                <reportElement x="0" y="0" width="430" height="30" uuid="faf223eb-7f4d-4401-b255-91ab5fea2f93"/>
+                                <reportElement x="0" y="0" width="430" height="30" uuid="f7700f0d-4b0a-45d8-b0e4-44b491d95057"/>
                                 <box leftPadding="10"/>
                                 <textElement textAlignment="Left" verticalAlignment="Middle"/>
                                 <text><![CDATA[TOTAL]]></text>
@@ -316,11 +314,11 @@
                             <property name="com.jaspersoft.studio.unit.height" value="px"/>
                         </jr:detailCell>
                     </jr:column>
-                    <jr:column width="125" uuid="a31bff28-6e75-460f-86f8-a9446ec82799">
+                    <jr:column width="125" uuid="a46edf0f-f9ba-46ae-a194-94e476e79a22">
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
                         <jr:columnFooter style="Table 1_CH" height="30" rowSpan="1">
                             <textField>
-                                <reportElement x="0" y="0" width="125" height="30" uuid="b38557e3-b8f1-4fde-b5fc-30ca006efc97"/>
+                                <reportElement x="0" y="0" width="125" height="30" uuid="d972bbff-b4fd-4b87-ba9e-3b782695b533"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle"/>
                                 <textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
                             </textField>
@@ -329,13 +327,8 @@
                     </jr:column>
                 </jr:table>
             </componentElement>
-        </band>
-    </columnFooter>
-    <pageFooter>
-        <band height="81" splitType="Stretch">
-            <property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
             <staticText>
-                <reportElement x="0" y="0" width="555" height="27" uuid="9d000953-e6fa-4297-a9e1-16491eeadf31"/>
+                <reportElement x="0" y="30" width="555" height="27" uuid="33324f1f-f9e7-4408-ac0e-69e5861f12af"/>
                 <box leftPadding="10">
                     <leftPen lineWidth="1.0"/>
                     <rightPen lineWidth="1.0"/>
@@ -344,24 +337,7 @@
                 <text><![CDATA[Thank You For Shopping With Us !]]></text>
             </staticText>
             <staticText>
-                <reportElement x="0" y="27" width="555" height="27" uuid="10c8ede5-3c79-4a34-a913-47b92104dd21">
-                    <property name="com.jaspersoft.layout.grid.x" value="0"/>
-                    <property name="com.jaspersoft.layout.grid.y" value="-1"/>
-                    <property name="com.jaspersoft.layout.grid.weight.x" value="1.0"/>
-                    <property name="com.jaspersoft.layout.grid.weight.y" value="1.0"/>
-                    <property name="com.jaspersoft.layout.grid.rowspan" value="1"/>
-                    <property name="com.jaspersoft.layout.grid.colspan" value="1"/>
-                    <property name="com.jaspersoft.layout.grid.weight.fixed" value="false"/>
-                </reportElement>
-                <box leftPadding="10">
-                    <leftPen lineWidth="1.0"/>
-                    <rightPen lineWidth="1.0"/>
-                </box>
-                <textElement verticalAlignment="Middle"/>
-                <text><![CDATA[Best Regards]]></text>
-            </staticText>
-            <staticText>
-                <reportElement x="0" y="54" width="555" height="27" uuid="30e450b0-d81d-4532-9583-bb800c0f4775">
+                <reportElement x="0" y="71" width="555" height="40" uuid="2f8785d5-bc40-4c2c-a82a-b00d776e7677">
                     <property name="com.jaspersoft.layout.grid.x" value="0"/>
                     <property name="com.jaspersoft.layout.grid.y" value="-1"/>
                     <property name="com.jaspersoft.layout.grid.weight.x" value="1.0"/>
@@ -378,9 +354,23 @@
                 <textElement verticalAlignment="Middle"/>
                 <text><![CDATA[Ecommerce Teams]]></text>
             </staticText>
+            <staticText>
+                <reportElement x="0" y="30" width="555" height="81" uuid="5d461561-a737-413c-8537-59d905dce25c">
+                    <property name="com.jaspersoft.layout.grid.x" value="0"/>
+                    <property name="com.jaspersoft.layout.grid.y" value="-1"/>
+                    <property name="com.jaspersoft.layout.grid.weight.x" value="1.0"/>
+                    <property name="com.jaspersoft.layout.grid.weight.y" value="1.0"/>
+                    <property name="com.jaspersoft.layout.grid.rowspan" value="1"/>
+                    <property name="com.jaspersoft.layout.grid.colspan" value="1"/>
+                    <property name="com.jaspersoft.layout.grid.weight.fixed" value="false"/>
+                </reportElement>
+                <box leftPadding="10">
+                    <leftPen lineWidth="1.0"/>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement verticalAlignment="Middle"/>
+                <text><![CDATA[Best Regards]]></text>
+            </staticText>
         </band>
-    </pageFooter>
-    <summary>
-        <band height="42" splitType="Stretch"/>
-    </summary>
+    </detail>
 </jasperReport>

@@ -2,6 +2,8 @@ package com.build.ECommerce.service;
 
 import com.build.ECommerce.dto.responseDto.OrderResponseDto;
 import com.build.ECommerce.entity.Order;
+import jakarta.mail.MessagingException;
+import net.sf.jasperreports.engine.JRException;
 
 import java.util.List;
 
@@ -13,6 +15,6 @@ public interface OrderService {
 
     List<OrderResponseDto> getAllOrdersByUserEmail(String userEmail);
 
-    OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus);
+    OrderResponseDto updateOrderStatus(Long orderId, Order.OrderStatus orderStatus) throws JRException, MessagingException;
 
 }
