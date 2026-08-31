@@ -37,19 +37,22 @@ public class EmailService {
     private String fromEmail;
 
     public void sendOrderConfirmationEmail(Order order) {
+        User user = order.getUser();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
-        message.setTo("vhadjz5965@minitts.net");
+        message.setTo(user.getEmail());
         message.setSubject("Order Confirmation - Order # "+order.getId());
         StringBuilder messageText = new StringBuilder();
-        messageText.append("Order Confirmed \n " +
-                "Hello\n\n "+
-                "Your Order has been placed successfully\n\n"+
-                "Order ID: "+order.getId()+"\n"+
-                "Order Status: "+order.getStatus()+"\n"+
-                "Order Date: "+order.getCreatedAt()+"\n\n"+
-                "Order Details:\n"+
-                "--------------------------------\n");
+        messageText.append("Order Confirmed \n " + "Hello\n\n " + "Your Order has been placed successfully\n\n" + "Order ID: ")
+                .append(order.getId()).append("\n")
+                .append("Order Status: ")
+                .append(order.getStatus())
+                .append("\n")
+                .append("Order Date: ")
+                .append(order.getCreatedAt())
+                .append("\n\n")
+                .append("Order Details:\n")
+                .append("--------------------------------\n");
         for(OrderItem orderItem : order.getOrderItems()) {
             BigDecimal subTotal = orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
             messageText.append("Product: ")
@@ -74,64 +77,64 @@ public class EmailService {
     }
 
     public void sendDeliveringConfirmationEmail(Order order) {
+        User user = order.getUser();
         SimpleMailMessage deliveringMessage = new SimpleMailMessage();
         deliveringMessage.setFrom(fromEmail);
-        deliveringMessage.setTo("vhadjz5965@minitts.net");
+        deliveringMessage.setTo(user.getEmail());
         deliveringMessage.setSubject("Order Delivery - Order # "+order.getId());
-        StringBuilder deliveringText = new StringBuilder();
-        deliveringText.append("Order Delivery \n");
-        deliveringText.append("Your order "+order.getId()+" is on delivery\n");
-        deliveringText.append("Order ID: "+order.getId()+"\n");
-        deliveringText.append("Order Status: "+order.getStatus()+"\n");
-        deliveringText.append("Order Address: "+order.getAddress()+"\n");
-        deliveringText.append("Your Order will be delivered on the given address\n");
-        deliveringText.append("---------------------------------\n");
-        deliveringText.append("Thank You For Shopping with Us!\n\n");
-        deliveringText.append("Best Regards\n");
-        deliveringText.append("Ecommerce Team");
-        deliveringMessage.setText(deliveringText.toString());
+        String deliveringText = "Order Delivery \n" + "Your order "
+                + order.getId() + " is on delivery\n"
+                + "Order ID: " + order.getId() + "\n"
+                + "Order Status: " + order.getStatus() + "\n"
+                + "Order Address: " + order.getAddress() + "\n"
+                + "Your Order will be delivered on the given address\n"
+                + "---------------------------------\n"
+                + "Thank You For Shopping with Us!\n\n"
+                + "Best Regards\n"
+                + "Ecommerce Team";
+        deliveringMessage.setText(deliveringText);
         mailSender.send(deliveringMessage);
     }
 
     public void sendDeliveredConfirmationEmail(Order order) throws JRException, MessagingException {
+        User user = order.getUser();
         byte[] bill = generateBill(order.getId());
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(fromEmail);
-        helper.setTo("vhadjz5965@minitts.net");
+        helper.setTo(user.getEmail());
         helper.setSubject("Order Delivered - Order # "+order.getId());
-        StringBuilder deliveredText = new StringBuilder();
-        deliveredText.append("Order Delivered \n");
-        deliveredText.append("Your order "+order.getId()+" has been delivered to your given address\n");
-        deliveredText.append("Order ID: "+order.getId()+"\n");
-        deliveredText.append("Order Status: "+order.getStatus()+"\n");
-        deliveredText.append("Order Address: "+order.getAddress()+"\n");
-        deliveredText.append("We hope you are satisfied with your success");
-        deliveredText.append("---------------------------------\n");
-        deliveredText.append("Thank You For Shopping with Us!\n\n");
-        deliveredText.append("Best Regards\n");
-        deliveredText.append("Ecommerce Team");
-        helper.setText(deliveredText.toString());
+        String deliveredText = "Order Delivered \n" +
+                "Your order " + order.getId() + " has been delivered to your given address\n" +
+                "Order ID: " + order.getId() + "\n" +
+                "Order Status: " + order.getStatus() + "\n" +
+                "Order Address: " + order.getAddress() + "\n" +
+                "We hope you are satisfied with your success" +
+                "---------------------------------\n" +
+                "Thank You For Shopping with Us!\n\n" +
+                "Best Regards\n" +
+                "Ecommerce Team";
+        helper.setText(deliveredText);
         helper.addAttachment("Order-Bill-"+order.getId()+".pdf",new ByteArrayResource(bill));
         mailSender.send(message);
     }
 
     public void sendCancelledConfirmationEmail(Order order) {
+        User user = order.getUser();
         SimpleMailMessage cancelledMessage = new SimpleMailMessage();
         cancelledMessage.setFrom(fromEmail);
-        cancelledMessage.setTo("vhadjz5965@minitts.net");
+        cancelledMessage.setTo(user.getEmail());
         cancelledMessage.setSubject("Order Cancelled - Order # "+order.getId());
-        StringBuilder cancelledText = new StringBuilder();
-        cancelledText.append("Order Cancelled \n");
-        cancelledText.append("Your order "+order.getId()+" has been cancelled\n");
-        cancelledText.append("Order ID: "+order.getId()+"\n");
-        cancelledText.append("Order Status: "+order.getStatus()+"\n");
-        cancelledText.append("If you didn't cancel your oder, please contact ECommerce Teams");
-        cancelledText.append("--------------------------------\n");
-        cancelledText.append("Thank You !\n\n");
-        cancelledText.append("Best Regards\n");
-        cancelledText.append("Ecommerce Team");
-        cancelledMessage.setText(cancelledText.toString());
+        String cancelledText = "Order Cancelled \n" +
+                "Your order " + order.getId() + " has been cancelled\n" +
+                "Order ID: " + order.getId() + "\n" +
+                "Order Status: " + order.getStatus() + "\n" +
+                "If you didn't cancel your oder, please contact ECommerce Teams" +
+                "--------------------------------\n" +
+                "Thank You !\n\n" +
+                "Best Regards\n" +
+                "Ecommerce Team";
+        cancelledMessage.setText(cancelledText);
         mailSender.send(cancelledMessage);
     }
 
@@ -149,7 +152,7 @@ public class EmailService {
         Path path = Paths.get(resourceDir,"Bill.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(path.toString());
         Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        JRBeanCollectionDataSource orderDataSource = new JRBeanCollectionDataSource(orderRepository.findAll());
+        JRBeanCollectionDataSource orderDataSource = new JRBeanCollectionDataSource(List.of(order));
         Map<String,Object> data = new HashMap<>();
         for(Field field : order.getClass().getDeclaredFields()){
             field.setAccessible(true);
